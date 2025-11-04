@@ -25,6 +25,9 @@ server = []
 # Run as a client
 client = []
 
+# KCP support
+kcp = ["tokio_kcp"]
+
 # TLS support
 native-tls = ["tokio-native-tls"]
 rustls = [
@@ -58,7 +61,7 @@ hot-reload = ["notify"]
 
 # Default feature releasing embedded devices
 # Cross-compiling with tls is hard. So we don't :(
-embedded = ["server", "client", "hot-reload", "noise"]
+embedded = ["server", "client", "hot-reload", "noise", "kcp"]
 
 # Feature to enable tokio-console. Disabled by default.
 # Don't enable it unless for debugging purposes.
@@ -125,6 +128,7 @@ tokio-rustls = { version = "0.25", optional = true }
 rustls-native-certs = { version = "0.7", optional = true }
 rustls-pemfile = { version = "2.0", optional = true }
 p12 = { version = "0.6.3", optional = true }
+tokio_kcp = { version = "0.9", optional = true }
 
 [target.'cfg(target_env = "musl")'.dependencies]
 openssl = { version = "0.10", features = ["vendored"], optional = true }

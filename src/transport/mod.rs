@@ -70,6 +70,11 @@ pub trait Transport: Debug + Send + Sync {
 mod tcp;
 pub use tcp::TcpTransport;
 
+#[cfg(feature = "kcp")]
+mod kcp_transport;
+#[cfg(feature = "kcp")]
+pub use kcp_transport::KcpTransport;
+
 #[cfg(all(feature = "native-tls", feature = "rustls"))]
 compile_error!("Only one of `native-tls` and `rustls` can be enabled");
 

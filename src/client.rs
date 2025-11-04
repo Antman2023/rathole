@@ -27,6 +27,8 @@ use crate::transport::NoiseTransport;
 use crate::transport::TlsTransport;
 #[cfg(any(feature = "websocket-native-tls", feature = "websocket-rustls"))]
 use crate::transport::WebsocketTransport;
+#[cfg(feature = "kcp")]
+use crate::transport::KcpTransport;
 
 use crate::constants::{run_control_chan_backoff, UDP_BUFFER_SIZE, UDP_SENDQ_SIZE, UDP_TIMEOUT};
 
@@ -73,6 +75,15 @@ pub async fn run_client(
             }
             #[cfg(not(any(feature = "websocket-native-tls", feature = "websocket-rustls")))]
             crate::helper::feature_neither_compile("websocket-native-tls", "websocket-rustls")
+        }
+        TransportType::Kcp => {
+            #[cfg(feature = "kcp")]
+            {
+                let mut client = Client::<KcpTransport>::from(config).await?;
+                client.run(shutdown_rx, update_rx).await
+            }
+            #[cfg(not(feature = "kcp"))]
+            crate::helper::feature_not_compile("kcp")
         }
     }
 }

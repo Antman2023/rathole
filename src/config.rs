@@ -51,6 +51,8 @@ pub enum TransportType {
     Noise,
     #[serde(rename = "websocket")]
     Websocket,
+    #[serde(rename = "kcp")]
+    Kcp,
 }
 
 /// Per service config
@@ -143,6 +145,67 @@ pub struct WebsocketConfig {
     pub tls: bool,
 }
 
+fn default_kcp_mtu() -> u32 {
+    1400
+}
+
+fn default_kcp_sndwnd() -> u32 {
+    512
+}
+
+fn default_kcp_rcvwnd() -> u32 {
+    512
+}
+
+fn default_kcp_nodelay() -> u32 {
+    1
+}
+
+fn default_kcp_interval() -> u32 {
+    10
+}
+
+fn default_kcp_resend() -> u32 {
+    2
+}
+
+fn default_kcp_nc() -> u32 {
+    1
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct KcpConfig {
+    #[serde(default = "default_kcp_mtu")]
+    pub mtu: u32,
+    #[serde(default = "default_kcp_sndwnd")]
+    pub sndwnd: u32,
+    #[serde(default = "default_kcp_rcvwnd")]
+    pub rcvwnd: u32,
+    #[serde(default = "default_kcp_nodelay")]
+    pub nodelay: u32,
+    #[serde(default = "default_kcp_interval")]
+    pub interval: u32,
+    #[serde(default = "default_kcp_resend")]
+    pub resend: u32,
+    #[serde(default = "default_kcp_nc")]
+    pub nc: u32,
+}
+
+impl Default for KcpConfig {
+    fn default() -> Self {
+        Self {
+            mtu: default_kcp_mtu(),
+            sndwnd: default_kcp_sndwnd(),
+            rcvwnd: default_kcp_rcvwnd(),
+            nodelay: default_kcp_nodelay(),
+            interval: default_kcp_interval(),
+            resend: default_kcp_resend(),
+            nc: default_kcp_nc(),
+        }
+    }
+}
+
 fn default_nodelay() -> bool {
     DEFAULT_NODELAY
 }
@@ -188,6 +251,8 @@ pub struct TransportConfig {
     pub tls: Option<TlsConfig>,
     pub noise: Option<NoiseConfig>,
     pub websocket: Option<WebsocketConfig>,
+    #[serde(default)]
+    pub kcp: KcpConfig,
 }
 
 fn default_heartbeat_timeout() -> u64 {
@@ -323,6 +388,7 @@ impl Config {
                 Ok(())
             }
             TransportType::Websocket => Ok(()),
+            TransportType::Kcp => Ok(()),
         }
     }
 
